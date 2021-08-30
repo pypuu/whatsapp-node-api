@@ -17,4 +17,16 @@ router.get('/checkauth', async (req, res) => {
     })
 });
 
+router.get('/logout', async (req, res) => {
+    client.logout().then(() => {
+        try {
+            fs.unlinkSync('../session.json')
+        } catch(err) {
+            console.log(err)
+        }
+        console.log('Session cerrada');
+        res.send('LOGOUT')
+    });
+});
+
 module.exports = router;
