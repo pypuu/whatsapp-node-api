@@ -2,7 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require('fs');
 const axios = require('axios');
-const shelljs = require('shelljs');
+const qrcode = require('qrcode-terminal');
+// const shelljs = require('shelljs');
+
 
 const config = require('./config.json');
 const { Client } = require('whatsapp-web.js');
@@ -16,12 +18,8 @@ if (fs.existsSync(SESSION_FILE_PATH)) {
 process.title = "whatsapp-node-api";
 global.client = new Client({
     puppeteer: {
-        headless: true,
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--unhandled-rejections=strict'
-    ]},
+        browserWSEndpoint: `ws://browser:3000`
+    },
     session: sessionCfg
 });
 
@@ -37,7 +35,14 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 client.on('qr', qr => {
-    fs.writeFileSync('./components/last.qr', qr);
+    // fs.writeFileSync('./components/last.qr', qr);
+    fs.readFile('session.json', (serr, sessiondata) => {
+        if (sessiondata) {
+            console.log("Already Authenticated");
+        } else {
+            qrcode.generate(qr, {small: true});
+        }
+    });
 });
 
 
@@ -51,10 +56,6 @@ client.on('authenticated', (session) => {
         }
         authed = true;
     });
-
-    try {
-        fs.unlinkSync('./components/last.qr')
-    } catch(err) {}
 });
 
 client.on('auth_failure', () => {
