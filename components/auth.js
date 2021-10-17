@@ -9,7 +9,7 @@ router.get('/checkauth', async (req, res) => {
         if (err) {
             res.send("DISCONNECTED")
             try {
-                fs.unlinkSync('../session.json')
+                fs.unlinkSync('./session.json')
             } catch(err) {
                 console.log(err)
             }
@@ -20,7 +20,7 @@ router.get('/checkauth', async (req, res) => {
 router.get('/logout', async (req, res) => {
     client.logout().then(() => {
         try {
-            fs.unlinkSync('../session.json')
+            fs.unlinkSync('./session.json')
         } catch(err) {
             console.log(err)
         }
